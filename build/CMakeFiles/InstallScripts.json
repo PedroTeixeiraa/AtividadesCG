@@ -1,0 +1,9 @@
+{
+	"InstallScripts" : 
+	[
+		"/Users/pedroalves/Personal/AtividadesCG/build/cmake_install.cmake",
+		"/Users/pedroalves/Personal/AtividadesCG/build/_deps/glm-build/cmake_install.cmake",
+		"/Users/pedroalves/Personal/AtividadesCG/build/_deps/glm-build/glm/cmake_install.cmake"
+	],
+	"Parallel" : false
+}

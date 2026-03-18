@@ -1,0 +1,10 @@
+/Users/pedroalves/Personal/AtividadesCG/build/CMakeFiles/Hello3D.dir
+/Users/pedroalves/Personal/AtividadesCG/build/CMakeFiles/TriangleTex.dir
+/Users/pedroalves/Personal/AtividadesCG/build/CMakeFiles/SpherePhong.dir
+/Users/pedroalves/Personal/AtividadesCG/build/CMakeFiles/edit_cache.dir
+/Users/pedroalves/Personal/AtividadesCG/build/CMakeFiles/rebuild_cache.dir
+/Users/pedroalves/Personal/AtividadesCG/build/_deps/glm-build/CMakeFiles/edit_cache.dir
+/Users/pedroalves/Personal/AtividadesCG/build/_deps/glm-build/CMakeFiles/rebuild_cache.dir
+/Users/pedroalves/Personal/AtividadesCG/build/_deps/glm-build/glm/CMakeFiles/glm.dir
+/Users/pedroalves/Personal/AtividadesCG/build/_deps/glm-build/glm/CMakeFiles/edit_cache.dir
+/Users/pedroalves/Personal/AtividadesCG/build/_deps/glm-build/glm/CMakeFiles/rebuild_cache.dir

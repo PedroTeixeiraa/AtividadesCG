@@ -1,0 +1,1 @@
+/opt/homebrew/bin/aarch64-apple-darwin25-g++-15 -g -arch arm64 -Wl,-search_paths_first -Wl,-headerpad_max_install_names CMakeFiles/SpherePhong.dir/src/SpherePhong.cpp.o CMakeFiles/SpherePhong.dir/common/glad.c.o -o SpherePhong  -Wl,-rpath,/opt/homebrew/lib /opt/homebrew/lib/libglfw.3.4.dylib -framework OpenGL
