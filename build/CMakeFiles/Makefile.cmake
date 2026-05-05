@@ -77,6 +77,7 @@ set(CMAKE_MAKEFILE_PRODUCTS
 # Dependency information for all targets:
 set(CMAKE_DEPEND_INFO_FILES
   "CMakeFiles/Hello3D.dir/DependInfo.cmake"
+  "CMakeFiles/CubeScene.dir/DependInfo.cmake"
   "CMakeFiles/TriangleTex.dir/DependInfo.cmake"
   "CMakeFiles/SpherePhong.dir/DependInfo.cmake"
   "_deps/glm-build/glm/CMakeFiles/glm.dir/DependInfo.cmake"

@@ -1,4 +1,5 @@
 /Users/pedroalves/Personal/AtividadesCG/build/CMakeFiles/Hello3D.dir
+/Users/pedroalves/Personal/AtividadesCG/build/CMakeFiles/CubeScene.dir
 /Users/pedroalves/Personal/AtividadesCG/build/CMakeFiles/TriangleTex.dir
 /Users/pedroalves/Personal/AtividadesCG/build/CMakeFiles/SpherePhong.dir
 /Users/pedroalves/Personal/AtividadesCG/build/CMakeFiles/edit_cache.dir

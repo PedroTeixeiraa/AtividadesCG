@@ -130,6 +130,19 @@ Hello3D/fast:
 .PHONY : Hello3D/fast
 
 #=============================================================================
+# Target rules for targets named CubeScene
+
+# Build rule for target.
+CubeScene: cmake_check_build_system
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 CubeScene
+.PHONY : CubeScene
+
+# fast build rule for target.
+CubeScene/fast:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/CubeScene.dir/build.make CMakeFiles/CubeScene.dir/build
+.PHONY : CubeScene/fast
+
+#=============================================================================
 # Target rules for targets named TriangleTex
 
 # Build rule for target.
@@ -174,6 +187,7 @@ common/glad.o: common/glad.c.o
 # target to build an object file
 common/glad.c.o:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/Hello3D.dir/build.make CMakeFiles/Hello3D.dir/common/glad.c.o
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/CubeScene.dir/build.make CMakeFiles/CubeScene.dir/common/glad.c.o
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/TriangleTex.dir/build.make CMakeFiles/TriangleTex.dir/common/glad.c.o
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/SpherePhong.dir/build.make CMakeFiles/SpherePhong.dir/common/glad.c.o
 .PHONY : common/glad.c.o
@@ -184,6 +198,7 @@ common/glad.i: common/glad.c.i
 # target to preprocess a source file
 common/glad.c.i:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/Hello3D.dir/build.make CMakeFiles/Hello3D.dir/common/glad.c.i
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/CubeScene.dir/build.make CMakeFiles/CubeScene.dir/common/glad.c.i
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/TriangleTex.dir/build.make CMakeFiles/TriangleTex.dir/common/glad.c.i
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/SpherePhong.dir/build.make CMakeFiles/SpherePhong.dir/common/glad.c.i
 .PHONY : common/glad.c.i
@@ -194,9 +209,34 @@ common/glad.s: common/glad.c.s
 # target to generate assembly for a file
 common/glad.c.s:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/Hello3D.dir/build.make CMakeFiles/Hello3D.dir/common/glad.c.s
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/CubeScene.dir/build.make CMakeFiles/CubeScene.dir/common/glad.c.s
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/TriangleTex.dir/build.make CMakeFiles/TriangleTex.dir/common/glad.c.s
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/SpherePhong.dir/build.make CMakeFiles/SpherePhong.dir/common/glad.c.s
 .PHONY : common/glad.c.s
+
+src/CubeScene.o: src/CubeScene.cpp.o
+.PHONY : src/CubeScene.o
+
+# target to build an object file
+src/CubeScene.cpp.o:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/CubeScene.dir/build.make CMakeFiles/CubeScene.dir/src/CubeScene.cpp.o
+.PHONY : src/CubeScene.cpp.o
+
+src/CubeScene.i: src/CubeScene.cpp.i
+.PHONY : src/CubeScene.i
+
+# target to preprocess a source file
+src/CubeScene.cpp.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/CubeScene.dir/build.make CMakeFiles/CubeScene.dir/src/CubeScene.cpp.i
+.PHONY : src/CubeScene.cpp.i
+
+src/CubeScene.s: src/CubeScene.cpp.s
+.PHONY : src/CubeScene.s
+
+# target to generate assembly for a file
+src/CubeScene.cpp.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/CubeScene.dir/build.make CMakeFiles/CubeScene.dir/src/CubeScene.cpp.s
+.PHONY : src/CubeScene.cpp.s
 
 src/Hello3D.o: src/Hello3D.cpp.o
 .PHONY : src/Hello3D.o
@@ -278,6 +318,7 @@ help:
 	@echo "... depend"
 	@echo "... edit_cache"
 	@echo "... rebuild_cache"
+	@echo "... CubeScene"
 	@echo "... Hello3D"
 	@echo "... SpherePhong"
 	@echo "... TriangleTex"
@@ -285,6 +326,9 @@ help:
 	@echo "... common/glad.o"
 	@echo "... common/glad.i"
 	@echo "... common/glad.s"
+	@echo "... src/CubeScene.o"
+	@echo "... src/CubeScene.i"
+	@echo "... src/CubeScene.s"
 	@echo "... src/Hello3D.o"
 	@echo "... src/Hello3D.i"
 	@echo "... src/Hello3D.s"

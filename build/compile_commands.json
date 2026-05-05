@@ -13,6 +13,18 @@
 },
 {
   "directory": "/Users/pedroalves/Personal/AtividadesCG/build",
+  "command": "/opt/homebrew/bin/aarch64-apple-darwin25-g++-15  -I/Users/pedroalves/Personal/AtividadesCG/include -I/Users/pedroalves/Personal/AtividadesCG/common -I/Users/pedroalves/Personal/AtividadesCG/include/glad -I/Users/pedroalves/Personal/AtividadesCG/build/_deps/glm-src -I/Users/pedroalves/Personal/AtividadesCG/build/_deps/stb_image-src -F/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks -isystem /opt/homebrew/include -g -std=gnu++17 -arch arm64 -Wno-pragmas -o CMakeFiles/CubeScene.dir/src/CubeScene.cpp.o -c /Users/pedroalves/Personal/AtividadesCG/src/CubeScene.cpp",
+  "file": "/Users/pedroalves/Personal/AtividadesCG/src/CubeScene.cpp",
+  "output": "CMakeFiles/CubeScene.dir/src/CubeScene.cpp.o"
+},
+{
+  "directory": "/Users/pedroalves/Personal/AtividadesCG/build",
+  "command": "/opt/homebrew/bin/aarch64-apple-darwin25-gcc-15  -I/Users/pedroalves/Personal/AtividadesCG/include -I/Users/pedroalves/Personal/AtividadesCG/common -I/Users/pedroalves/Personal/AtividadesCG/include/glad -I/Users/pedroalves/Personal/AtividadesCG/build/_deps/glm-src -I/Users/pedroalves/Personal/AtividadesCG/build/_deps/stb_image-src -F/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks -isystem /opt/homebrew/include -g -arch arm64 -Wno-pragmas -o CMakeFiles/CubeScene.dir/common/glad.c.o -c /Users/pedroalves/Personal/AtividadesCG/common/glad.c",
+  "file": "/Users/pedroalves/Personal/AtividadesCG/common/glad.c",
+  "output": "CMakeFiles/CubeScene.dir/common/glad.c.o"
+},
+{
+  "directory": "/Users/pedroalves/Personal/AtividadesCG/build",
   "command": "/opt/homebrew/bin/aarch64-apple-darwin25-g++-15  -I/Users/pedroalves/Personal/AtividadesCG/include -I/Users/pedroalves/Personal/AtividadesCG/common -I/Users/pedroalves/Personal/AtividadesCG/include/glad -I/Users/pedroalves/Personal/AtividadesCG/build/_deps/glm-src -I/Users/pedroalves/Personal/AtividadesCG/build/_deps/stb_image-src -F/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks -isystem /opt/homebrew/include -g -std=gnu++17 -arch arm64 -Wno-pragmas -o CMakeFiles/TriangleTex.dir/src/TriangleTex.cpp.o -c /Users/pedroalves/Personal/AtividadesCG/src/TriangleTex.cpp",
   "file": "/Users/pedroalves/Personal/AtividadesCG/src/TriangleTex.cpp",
   "output": "CMakeFiles/TriangleTex.dir/src/TriangleTex.cpp.o"
