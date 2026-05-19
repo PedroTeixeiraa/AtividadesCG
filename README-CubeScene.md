@@ -4,7 +4,18 @@ Exercício `CubeScene` em OpenGL com:
 - cubo colorido por face (malha triangular),
 - rotação nos eixos X/Y/Z,
 - translação e escala uniforme por teclado,
-- múltiplas instâncias de cubo.
+- múltiplas instâncias de cubo,
+- leitura de malha 3D `.obj` (somente geometria).
+
+## Leitor de malha 3D (OBJ)
+
+- Caminho inicial configurado no código: `../assets/Modelos3D/Cube.obj`.
+- Nesta etapa, o leitor usa somente a geometria (posições de vértices):
+  - lê linhas `v` e `f`,
+  - aceita faces `f v`, `f v/vt/vn` e `f v//vn`,
+  - triangula faces com mais de 3 vértices usando fan triangulation.
+- Materiais (`.mtl`), texturas e normais não são usados na renderização nesta atividade.
+- Se houver erro de leitura/parsing do `.obj`, o `CubeScene` usa automaticamente um cubo hardcoded de fallback.
 
 ## Pré-requisitos
 
