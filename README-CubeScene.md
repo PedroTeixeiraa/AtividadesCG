@@ -5,17 +5,28 @@ Exercício `CubeScene` em OpenGL com:
 - rotação nos eixos X/Y/Z,
 - translação e escala uniforme por teclado,
 - múltiplas instâncias de cubo,
-- leitura de malha 3D `.obj` (somente geometria).
+- leitura de malha 3D `.obj` com coordenadas de textura,
+- leitura básica de material `.mtl` (apenas `map_Kd`) para textura difusa.
 
-## Leitor de malha 3D (OBJ)
+## Leitor de malha 3D (OBJ + MTL)
 
-- Caminho inicial configurado no código: `../assets/Modelos3D/Cube.obj`.
-- Nesta etapa, o leitor usa somente a geometria (posições de vértices):
-  - lê linhas `v` e `f`,
+- Caminho inicial configurado no código: `../assets/Modelos3D/Suzanne.obj`.
+- O carregador:
+  - lê linhas `v`, `vt`, `f`, `mtllib` e `usemtl`,
   - aceita faces `f v`, `f v/vt/vn` e `f v//vn`,
-  - triangula faces com mais de 3 vértices usando fan triangulation.
-- Materiais (`.mtl`), texturas e normais não são usados na renderização nesta atividade.
-- Se houver erro de leitura/parsing do `.obj`, o `CubeScene` usa automaticamente um cubo hardcoded de fallback.
+  - triangula faces com mais de 3 vértices usando fan triangulation,
+  - armazena posição + UV como atributos de vértice.
+- No `.mtl`, nesta etapa, é lido apenas:
+  - `newmtl`
+  - `map_Kd` (nome do arquivo de textura difusa).
+- O shader usa textura quando `map_Kd` é encontrado e a imagem é carregada.
+- Se houver falha de leitura/parsing de `.obj`, `.mtl` ou textura, o `CubeScene` faz fallback para o cubo hardcoded colorido.
+
+## Limitações da etapa
+
+- Apenas o `map_Kd` é considerado do `.mtl`.
+- Em arquivos com múltiplos materiais/texturas, é usada a primeira textura difusa válida encontrada para o material ativo.
+- Normais (`vn`) do OBJ não são usadas nesta etapa.
 
 ## Pré-requisitos
 

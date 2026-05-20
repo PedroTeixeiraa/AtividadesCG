@@ -7,7 +7,9 @@
  */
 
 #include <assert.h>
+#include <array>
 #include <cstdlib>
+#include <filesystem>
 #include <fstream>
 #include <iostream>
 #include <sstream>
@@ -27,10 +29,16 @@ using namespace std;
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
 
+#define STB_IMAGE_IMPLEMENTATION
+#include <stb_image.h>
+
 void key_callback(GLFWwindow* window, int key, int scancode, int action, int mode);
 int setupShader();
 int setupGeometry();
-int loadSimpleOBJ(string filePATH, int& nVertices);
+int loadSimpleOBJ(const string& filePath, int& nVertices, string& outTexturePath, bool& outHasTexCoords);
+string trim(const string& value);
+string loadMapKdFromMTL(const string& mtlFilePath, const string& materialName);
+GLuint loadTexture(const string& filePath, int& width, int& height);
 
 const GLuint WIDTH = 1000, HEIGHT = 1000;
 const GLsizei DEFAULT_CUBE_VERTEX_COUNT = 36;
@@ -38,26 +46,41 @@ const float MOVE_STEP = 0.1f;
 const float SCALE_STEP = 0.1f;
 const float MIN_SCALE = 0.2f;
 GLsizei gMeshVertexCount = DEFAULT_CUBE_VERTEX_COUNT;
+GLuint gMeshTextureID = 0;
+bool gMeshUseTexture = false;
 
 const GLchar* vertexShaderSource = "#version 410\n"
 "layout (location = 0) in vec3 position;\n"
-"layout (location = 1) in vec3 color;\n"
+"layout (location = 1) in vec2 texCoord;\n"
+"layout (location = 2) in vec3 color;\n"
 "uniform mat4 model;\n"
 "uniform mat4 view;\n"
 "uniform mat4 projection;\n"
+"out vec2 finalTexCoord;\n"
 "out vec4 finalColor;\n"
 "void main()\n"
 "{\n"
 "gl_Position = projection * view * model * vec4(position, 1.0);\n"
+"finalTexCoord = texCoord;\n"
 "finalColor = vec4(color, 1.0);\n"
 "}\0";
 
 const GLchar* fragmentShaderSource = "#version 410\n"
+"in vec2 finalTexCoord;\n"
 "in vec4 finalColor;\n"
+"uniform sampler2D texBuff;\n"
+"uniform bool useTexture;\n"
 "out vec4 color;\n"
 "void main()\n"
 "{\n"
+"if (useTexture)\n"
+"{\n"
+"color = texture(texBuff, finalTexCoord);\n"
+"}\n"
+"else\n"
+"{\n"
 "color = finalColor;\n"
+"}\n"
 "}\n\0";
 
 enum RotationAxis
@@ -177,6 +200,8 @@ int main()
 	GLint modelLoc = glGetUniformLocation(shaderID, "model");
 	GLint viewLoc = glGetUniformLocation(shaderID, "view");
 	GLint projectionLoc = glGetUniformLocation(shaderID, "projection");
+	GLint texBuffLoc = glGetUniformLocation(shaderID, "texBuff");
+	GLint useTextureLoc = glGetUniformLocation(shaderID, "useTexture");
 
 	glm::mat4 view = glm::lookAt(
 		glm::vec3(0.0f, 2.0f, 7.0f),
@@ -192,6 +217,8 @@ int main()
 
 	glUniformMatrix4fv(viewLoc, 1, GL_FALSE, glm::value_ptr(view));
 	glUniformMatrix4fv(projectionLoc, 1, GL_FALSE, glm::value_ptr(projection));
+	glUniform1i(texBuffLoc, 0);
+	glUniform1i(useTextureLoc, gMeshUseTexture ? 1 : 0);
 
 	glEnable(GL_DEPTH_TEST);
 
@@ -210,6 +237,15 @@ int main()
 		const float angle = static_cast<GLfloat>(glfwGetTime());
 
 		glBindVertexArray(VAO);
+		if (gMeshUseTexture)
+		{
+			glActiveTexture(GL_TEXTURE0);
+			glBindTexture(GL_TEXTURE_2D, gMeshTextureID);
+		}
+		else
+		{
+			glBindTexture(GL_TEXTURE_2D, 0);
+		}
 		for (const CubeInstance& cube : cubes)
 		{
 			glm::mat4 model = glm::mat4(1.0f);
@@ -239,6 +275,10 @@ int main()
 		glfwSwapBuffers(window);
 	}
 
+	if (gMeshTextureID != 0)
+	{
+		glDeleteTextures(1, &gMeshTextureID);
+	}
 	glDeleteVertexArrays(1, &VAO);
 	glfwTerminate();
 	return 0;
@@ -357,105 +397,317 @@ int setupShader()
 	return shaderProgram;
 }
 
-int loadSimpleOBJ(string filePATH, int &nVertices)
- {
-    std::vector<glm::vec3> vertices;
-    std::vector<glm::vec2> texCoords;
-    std::vector<glm::vec3> normals;
-    std::vector<GLfloat> vBuffer;
-    glm::vec3 color = glm::vec3(1.0, 0.0, 0.0);
-
-    std::ifstream arqEntrada(filePATH.c_str());
-    if (!arqEntrada.is_open()) 
+string trim(const string& value)
+{
+	const size_t begin = value.find_first_not_of(" \t\r\n");
+	if (begin == string::npos)
 	{
-        std::cerr << "Erro ao tentar ler o arquivo " << filePATH << std::endl;
-        return -1;
-    }
+		return "";
+	}
+	const size_t end = value.find_last_not_of(" \t\r\n");
+	return value.substr(begin, end - begin + 1);
+}
 
-    std::string line;
-    while (std::getline(arqEntrada, line)) 
+string loadMapKdFromMTL(const string& mtlFilePath, const string& materialName)
+{
+	ifstream mtlFile(mtlFilePath.c_str());
+	if (!mtlFile.is_open())
 	{
-        std::istringstream ssline(line);
-        std::string word;
-        ssline >> word;
+		cerr << "Falha ao abrir MTL: " << mtlFilePath << endl;
+		return "";
+	}
 
-        if (word == "v") 
+	string line;
+	string currentMaterial;
+	string firstMapKd;
+	while (getline(mtlFile, line))
+	{
+		line = trim(line);
+		if (line.empty() || line[0] == '#')
 		{
-            glm::vec3 vertice;
-            ssline >> vertice.x >> vertice.y >> vertice.z;
-            vertices.push_back(vertice);
-        } 
-        else if (word == "vt") 
+			continue;
+		}
+
+		istringstream ss(line);
+		string word;
+		ss >> word;
+		if (word == "newmtl")
 		{
-            glm::vec2 vt;
-            ssline >> vt.s >> vt.t;
-            texCoords.push_back(vt);
-        } 
-        else if (word == "vn") 
+			string rest;
+			getline(ss, rest);
+			currentMaterial = trim(rest);
+		}
+		else if (word == "map_Kd")
 		{
-            glm::vec3 normal;
-            ssline >> normal.x >> normal.y >> normal.z;
-            normals.push_back(normal);
-        } 
-        else if (word == "f")
-		 {
-            while (ssline >> word) 
+			string rest;
+			getline(ss, rest);
+			string mapKd = trim(rest);
+			if (mapKd.empty())
 			{
-                int vi = 0, ti = 0, ni = 0;
-                std::istringstream ss(word);
-                std::string index;
+				continue;
+			}
+			if (!materialName.empty() && currentMaterial == materialName)
+			{
+				return mapKd;
+			}
+			if (firstMapKd.empty())
+			{
+				firstMapKd = mapKd;
+			}
+		}
+	}
 
-                if (std::getline(ss, index, '/')) vi = !index.empty() ? std::stoi(index) - 1 : 0;
-                if (std::getline(ss, index, '/')) ti = !index.empty() ? std::stoi(index) - 1 : 0;
-                if (std::getline(ss, index)) ni = !index.empty() ? std::stoi(index) - 1 : 0;
+	return firstMapKd;
+}
 
-                vBuffer.push_back(vertices[vi].x);
-                vBuffer.push_back(vertices[vi].y);
-                vBuffer.push_back(vertices[vi].z);
-                vBuffer.push_back(color.r);
-                vBuffer.push_back(color.g);
-                vBuffer.push_back(color.b);
-            }
-        }
-    }
+GLuint loadTexture(const string& filePath, int& width, int& height)
+{
+	GLuint texID = 0;
+	glGenTextures(1, &texID);
+	glBindTexture(GL_TEXTURE_2D, texID);
 
-    arqEntrada.close();
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 
-    std::cout << "Gerando o buffer de geometria..." << std::endl;
-    GLuint VBO, VAO;
-    glGenBuffers(1, &VBO);
-    glBindBuffer(GL_ARRAY_BUFFER, VBO);
-    glBufferData(GL_ARRAY_BUFFER, vBuffer.size() * sizeof(GLfloat), vBuffer.data(), GL_STATIC_DRAW);
-    
-    glGenVertexArrays(1, &VAO);
-    glBindVertexArray(VAO);
-    
-    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(GLfloat), (GLvoid*)0);
-    glEnableVertexAttribArray(0);
+	stbi_set_flip_vertically_on_load(true);
+	int channels = 0;
+	unsigned char* data = stbi_load(filePath.c_str(), &width, &height, &channels, 0);
+	if (data == nullptr)
+	{
+		cerr << "Falha ao carregar textura: " << filePath << endl;
+		glBindTexture(GL_TEXTURE_2D, 0);
+		glDeleteTextures(1, &texID);
+		return 0;
+	}
 
-    glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(GLfloat), (GLvoid*)(3 * sizeof(GLfloat)));
-    glEnableVertexAttribArray(1);
-    
-    glBindBuffer(GL_ARRAY_BUFFER, 0);
-    glBindVertexArray(0);
+	GLenum format = GL_RGB;
+	GLenum internalFormat = GL_RGB8;
+	if (channels == 1)
+	{
+		format = GL_RED;
+		internalFormat = GL_R8;
+	}
+	else if (channels == 4)
+	{
+		format = GL_RGBA;
+		internalFormat = GL_RGBA8;
+	}
 
-	nVertices = vBuffer.size() / 6;  // x, y, z, r, g, b (valores atualmente armazenados por vértice)
+	glTexImage2D(GL_TEXTURE_2D, 0, internalFormat, width, height, 0, format, GL_UNSIGNED_BYTE, data);
+	glGenerateMipmap(GL_TEXTURE_2D);
 
-    return VAO;
+	stbi_image_free(data);
+	glBindTexture(GL_TEXTURE_2D, 0);
+	return texID;
+}
+
+int loadSimpleOBJ(const string& filePath, int& nVertices, string& outTexturePath, bool& outHasTexCoords)
+{
+	struct OBJIndex
+	{
+		int vertex = -1;
+		int uv = -1;
+	};
+
+	vector<glm::vec3> vertices;
+	vector<glm::vec2> texCoords;
+	vector<GLfloat> vBuffer;
+	const glm::vec3 fallbackColor(1.0f, 1.0f, 1.0f);
+
+	string mtlFileName;
+	string currentMaterial;
+	string firstMaterialUsed;
+	outTexturePath.clear();
+	outHasTexCoords = false;
+
+	ifstream arqEntrada(filePath.c_str());
+	if (!arqEntrada.is_open())
+	{
+		cerr << "Erro ao tentar ler o arquivo " << filePath << endl;
+		return -1;
+	}
+
+	auto appendVertex = [&](const OBJIndex& idx) -> bool
+	{
+		if (idx.vertex < 0 || idx.vertex >= static_cast<int>(vertices.size()))
+		{
+			return false;
+		}
+
+		glm::vec2 uv(0.0f, 0.0f);
+		if (idx.uv >= 0 && idx.uv < static_cast<int>(texCoords.size()))
+		{
+			uv = texCoords[static_cast<size_t>(idx.uv)];
+			outHasTexCoords = true;
+		}
+
+		const glm::vec3& pos = vertices[static_cast<size_t>(idx.vertex)];
+		vBuffer.push_back(pos.x);
+		vBuffer.push_back(pos.y);
+		vBuffer.push_back(pos.z);
+		vBuffer.push_back(uv.x);
+		vBuffer.push_back(uv.y);
+		vBuffer.push_back(fallbackColor.r);
+		vBuffer.push_back(fallbackColor.g);
+		vBuffer.push_back(fallbackColor.b);
+		return true;
+	};
+
+	string line;
+	while (getline(arqEntrada, line))
+	{
+		istringstream ssline(line);
+		string word;
+		ssline >> word;
+		if (word.empty() || word[0] == '#')
+		{
+			continue;
+		}
+
+		if (word == "v")
+		{
+			glm::vec3 vertice;
+			ssline >> vertice.x >> vertice.y >> vertice.z;
+			vertices.push_back(vertice);
+		}
+		else if (word == "vt")
+		{
+			glm::vec2 vt;
+			ssline >> vt.x >> vt.y;
+			texCoords.push_back(vt);
+		}
+		else if (word == "mtllib")
+		{
+			string rest;
+			getline(ssline, rest);
+			mtlFileName = trim(rest);
+		}
+		else if (word == "usemtl")
+		{
+			string rest;
+			getline(ssline, rest);
+			currentMaterial = trim(rest);
+			if (firstMaterialUsed.empty() && !currentMaterial.empty())
+			{
+				firstMaterialUsed = currentMaterial;
+			}
+		}
+		else if (word == "f")
+		{
+			vector<OBJIndex> face;
+			string token;
+			while (ssline >> token)
+			{
+				OBJIndex idx;
+				istringstream sstoken(token);
+				string part;
+
+				if (getline(sstoken, part, '/') && !part.empty())
+				{
+					idx.vertex = stoi(part) - 1;
+				}
+				if (getline(sstoken, part, '/') && !part.empty())
+				{
+					idx.uv = stoi(part) - 1;
+				}
+				face.push_back(idx);
+			}
+
+			if (face.size() < 3)
+			{
+				continue;
+			}
+
+			for (size_t i = 1; i + 1 < face.size(); ++i)
+			{
+				if (!appendVertex(face[0]) || !appendVertex(face[i]) || !appendVertex(face[i + 1]))
+				{
+					cerr << "Falha ao processar face do OBJ: " << filePath << endl;
+					return -1;
+				}
+			}
+		}
+	}
+
+	if (!mtlFileName.empty())
+	{
+		filesystem::path objPath(filePath);
+		filesystem::path mtlPath = objPath.parent_path() / mtlFileName;
+		string mapKd = loadMapKdFromMTL(mtlPath.string(), firstMaterialUsed);
+		if (!mapKd.empty())
+		{
+			filesystem::path texPath(mapKd);
+			if (texPath.is_relative())
+			{
+				texPath = mtlPath.parent_path() / texPath;
+			}
+			outTexturePath = texPath.lexically_normal().string();
+		}
+	}
+
+	if (vBuffer.empty())
+	{
+		cerr << "OBJ sem vertices renderizaveis: " << filePath << endl;
+		return -1;
+	}
+
+	GLuint VBO = 0;
+	GLuint VAO = 0;
+	glGenBuffers(1, &VBO);
+	glBindBuffer(GL_ARRAY_BUFFER, VBO);
+	glBufferData(GL_ARRAY_BUFFER, vBuffer.size() * sizeof(GLfloat), vBuffer.data(), GL_STATIC_DRAW);
+
+	glGenVertexArrays(1, &VAO);
+	glBindVertexArray(VAO);
+
+	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(GLfloat), (GLvoid*)0);
+	glEnableVertexAttribArray(0);
+	glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 8 * sizeof(GLfloat), (GLvoid*)(3 * sizeof(GLfloat)));
+	glEnableVertexAttribArray(1);
+	glVertexAttribPointer(2, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(GLfloat), (GLvoid*)(5 * sizeof(GLfloat)));
+	glEnableVertexAttribArray(2);
+
+	glBindBuffer(GL_ARRAY_BUFFER, 0);
+	glBindVertexArray(0);
+
+	nVertices = static_cast<int>(vBuffer.size() / 8);
+	return static_cast<int>(VAO);
 }
 
 int setupGeometry()
 {
 	int nVertices = 0;
-	const int objVAO = loadSimpleOBJ("../assets/Modelos3D/Cube.obj", nVertices);
+	string texturePath;
+	bool hasTexCoords = false;
+	const int objVAO = loadSimpleOBJ("../assets/Modelos3D/Suzanne.obj", nVertices, texturePath, hasTexCoords);
 	if (objVAO != -1 && nVertices > 0)
 	{
 		gMeshVertexCount = static_cast<GLsizei>(nVertices);
+		if (hasTexCoords && !texturePath.empty())
+		{
+			int texWidth = 0;
+			int texHeight = 0;
+			gMeshTextureID = loadTexture(texturePath, texWidth, texHeight);
+			gMeshUseTexture = (gMeshTextureID != 0);
+		}
+		else
+		{
+			gMeshUseTexture = false;
+		}
+
+		if (!gMeshUseTexture)
+		{
+			cerr << "OBJ carregado sem textura valida. Mantendo renderizacao por cor." << endl;
+		}
 		return objVAO;
 	}
 
 	cerr << "Falha no OBJ. Usando cubo hardcoded de fallback." << endl;
 	gMeshVertexCount = DEFAULT_CUBE_VERTEX_COUNT;
+	gMeshUseTexture = false;
+	gMeshTextureID = 0;
 
 	GLfloat vertices[] = {
 		// Frente (vermelho)
@@ -518,8 +770,8 @@ int setupGeometry()
 
 	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(GLfloat), (GLvoid*)0);
 	glEnableVertexAttribArray(0);
-	glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(GLfloat), (GLvoid*)(3 * sizeof(GLfloat)));
-	glEnableVertexAttribArray(1);
+	glVertexAttribPointer(2, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(GLfloat), (GLvoid*)(3 * sizeof(GLfloat)));
+	glEnableVertexAttribArray(2);
 
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
 	glBindVertexArray(0);
