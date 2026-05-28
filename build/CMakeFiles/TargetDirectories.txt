@@ -2,6 +2,7 @@
 /Users/pedroalves/Personal/AtividadesCG/build/CMakeFiles/CubeScene.dir
 /Users/pedroalves/Personal/AtividadesCG/build/CMakeFiles/TriangleTex.dir
 /Users/pedroalves/Personal/AtividadesCG/build/CMakeFiles/SpherePhong.dir
+/Users/pedroalves/Personal/AtividadesCG/build/CMakeFiles/CarScene.dir
 /Users/pedroalves/Personal/AtividadesCG/build/CMakeFiles/edit_cache.dir
 /Users/pedroalves/Personal/AtividadesCG/build/CMakeFiles/rebuild_cache.dir
 /Users/pedroalves/Personal/AtividadesCG/build/_deps/glm-build/CMakeFiles/edit_cache.dir

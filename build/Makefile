@@ -169,6 +169,19 @@ SpherePhong/fast:
 .PHONY : SpherePhong/fast
 
 #=============================================================================
+# Target rules for targets named CarScene
+
+# Build rule for target.
+CarScene: cmake_check_build_system
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 CarScene
+.PHONY : CarScene
+
+# fast build rule for target.
+CarScene/fast:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/CarScene.dir/build.make CMakeFiles/CarScene.dir/build
+.PHONY : CarScene/fast
+
+#=============================================================================
 # Target rules for targets named glm
 
 # Build rule for target.
@@ -190,6 +203,7 @@ common/glad.c.o:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/CubeScene.dir/build.make CMakeFiles/CubeScene.dir/common/glad.c.o
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/TriangleTex.dir/build.make CMakeFiles/TriangleTex.dir/common/glad.c.o
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/SpherePhong.dir/build.make CMakeFiles/SpherePhong.dir/common/glad.c.o
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/CarScene.dir/build.make CMakeFiles/CarScene.dir/common/glad.c.o
 .PHONY : common/glad.c.o
 
 common/glad.i: common/glad.c.i
@@ -201,6 +215,7 @@ common/glad.c.i:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/CubeScene.dir/build.make CMakeFiles/CubeScene.dir/common/glad.c.i
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/TriangleTex.dir/build.make CMakeFiles/TriangleTex.dir/common/glad.c.i
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/SpherePhong.dir/build.make CMakeFiles/SpherePhong.dir/common/glad.c.i
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/CarScene.dir/build.make CMakeFiles/CarScene.dir/common/glad.c.i
 .PHONY : common/glad.c.i
 
 common/glad.s: common/glad.c.s
@@ -212,7 +227,32 @@ common/glad.c.s:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/CubeScene.dir/build.make CMakeFiles/CubeScene.dir/common/glad.c.s
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/TriangleTex.dir/build.make CMakeFiles/TriangleTex.dir/common/glad.c.s
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/SpherePhong.dir/build.make CMakeFiles/SpherePhong.dir/common/glad.c.s
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/CarScene.dir/build.make CMakeFiles/CarScene.dir/common/glad.c.s
 .PHONY : common/glad.c.s
+
+src/CarScene.o: src/CarScene.cpp.o
+.PHONY : src/CarScene.o
+
+# target to build an object file
+src/CarScene.cpp.o:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/CarScene.dir/build.make CMakeFiles/CarScene.dir/src/CarScene.cpp.o
+.PHONY : src/CarScene.cpp.o
+
+src/CarScene.i: src/CarScene.cpp.i
+.PHONY : src/CarScene.i
+
+# target to preprocess a source file
+src/CarScene.cpp.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/CarScene.dir/build.make CMakeFiles/CarScene.dir/src/CarScene.cpp.i
+.PHONY : src/CarScene.cpp.i
+
+src/CarScene.s: src/CarScene.cpp.s
+.PHONY : src/CarScene.s
+
+# target to generate assembly for a file
+src/CarScene.cpp.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/CarScene.dir/build.make CMakeFiles/CarScene.dir/src/CarScene.cpp.s
+.PHONY : src/CarScene.cpp.s
 
 src/CubeScene.o: src/CubeScene.cpp.o
 .PHONY : src/CubeScene.o
@@ -318,6 +358,7 @@ help:
 	@echo "... depend"
 	@echo "... edit_cache"
 	@echo "... rebuild_cache"
+	@echo "... CarScene"
 	@echo "... CubeScene"
 	@echo "... Hello3D"
 	@echo "... SpherePhong"
@@ -326,6 +367,9 @@ help:
 	@echo "... common/glad.o"
 	@echo "... common/glad.i"
 	@echo "... common/glad.s"
+	@echo "... src/CarScene.o"
+	@echo "... src/CarScene.i"
+	@echo "... src/CarScene.s"
 	@echo "... src/CubeScene.o"
 	@echo "... src/CubeScene.i"
 	@echo "... src/CubeScene.s"

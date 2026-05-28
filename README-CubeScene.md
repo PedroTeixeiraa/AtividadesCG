@@ -5,28 +5,36 @@ Exercício `CubeScene` em OpenGL com:
 - rotação nos eixos X/Y/Z,
 - translação e escala uniforme por teclado,
 - múltiplas instâncias de cubo,
-- leitura de malha 3D `.obj` com coordenadas de textura,
-- leitura básica de material `.mtl` (apenas `map_Kd`) para textura difusa.
+- leitura de malha 3D `.obj` com normais de vértice (`vn`),
+- leitura de material `.mtl` com coeficientes de iluminação (`Ka`, `Kd`, `Ks`, `Ns`) e textura difusa (`map_Kd`),
+- iluminação por pixel com modelo de Phong no fragment shader.
 
 ## Leitor de malha 3D (OBJ + MTL)
 
-- Caminho inicial configurado no código: `../assets/Modelos3D/Suzanne.obj`.
+- Caminho inicial configurado no código: `../assets/Modelos3D/Car.obj`.
 - O carregador:
-  - lê linhas `v`, `vt`, `f`, `mtllib` e `usemtl`,
+  - lê linhas `v`, `vt`, `vn`, `f`, `mtllib` e `usemtl`,
   - aceita faces `f v`, `f v/vt/vn` e `f v//vn`,
   - triangula faces com mais de 3 vértices usando fan triangulation,
-  - armazena posição + UV como atributos de vértice.
-- No `.mtl`, nesta etapa, é lido apenas:
+  - centraliza e normaliza escala da malha automaticamente para caber no enquadramento padrão da cena,
+  - armazena posição + UV + normal + cor no buffer de vértices.
+- No `.mtl`, são lidos:
   - `newmtl`
-  - `map_Kd` (nome do arquivo de textura difusa).
-- O shader usa textura quando `map_Kd` é encontrado e a imagem é carregada.
+  - `Ka`, `Kd`, `Ks`, `Ns`
+  - `map_Kd` (textura difusa).
+- O shader calcula ambiente, difusa e especular (Phong), combinando material e textura quando disponível.
+- A luz principal está fixa à direita da cena para destacar visualmente as componentes difusa e especular do Phong.
 - Se houver falha de leitura/parsing de `.obj`, `.mtl` ou textura, o `CubeScene` faz fallback para o cubo hardcoded colorido.
 
 ## Limitações da etapa
 
-- Apenas o `map_Kd` é considerado do `.mtl`.
-- Em arquivos com múltiplos materiais/texturas, é usada a primeira textura difusa válida encontrada para o material ativo.
-- Normais (`vn`) do OBJ não são usadas nesta etapa.
+- Em arquivos com múltiplos materiais/texturas, o render separa lotes por `usemtl` e aplica um conjunto de coeficientes por lote.
+- O shader usa `Kd` do material como cor base quando não há textura válida para o lote.
+- Quando um coeficiente está ausente no `.mtl`, são usados defaults:
+  - `Ka = 0.1`
+  - `Kd = 1.0`
+  - `Ks = 0.5`
+  - `Ns = 32`
 
 ## Pré-requisitos
 

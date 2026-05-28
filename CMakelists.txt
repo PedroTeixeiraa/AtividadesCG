@@ -55,7 +55,7 @@ set(EXERCISES
     CubeScene
     TriangleTex
     SpherePhong
-   
+    CarScene
 )
 
 add_compile_options(-Wno-pragmas)
