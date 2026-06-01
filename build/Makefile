@@ -182,6 +182,19 @@ CarScene/fast:
 .PHONY : CarScene/fast
 
 #=============================================================================
+# Target rules for targets named FirstPersonCamera
+
+# Build rule for target.
+FirstPersonCamera: cmake_check_build_system
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 FirstPersonCamera
+.PHONY : FirstPersonCamera
+
+# fast build rule for target.
+FirstPersonCamera/fast:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/FirstPersonCamera.dir/build.make CMakeFiles/FirstPersonCamera.dir/build
+.PHONY : FirstPersonCamera/fast
+
+#=============================================================================
 # Target rules for targets named glm
 
 # Build rule for target.
@@ -204,6 +217,7 @@ common/glad.c.o:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/TriangleTex.dir/build.make CMakeFiles/TriangleTex.dir/common/glad.c.o
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/SpherePhong.dir/build.make CMakeFiles/SpherePhong.dir/common/glad.c.o
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/CarScene.dir/build.make CMakeFiles/CarScene.dir/common/glad.c.o
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/FirstPersonCamera.dir/build.make CMakeFiles/FirstPersonCamera.dir/common/glad.c.o
 .PHONY : common/glad.c.o
 
 common/glad.i: common/glad.c.i
@@ -216,6 +230,7 @@ common/glad.c.i:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/TriangleTex.dir/build.make CMakeFiles/TriangleTex.dir/common/glad.c.i
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/SpherePhong.dir/build.make CMakeFiles/SpherePhong.dir/common/glad.c.i
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/CarScene.dir/build.make CMakeFiles/CarScene.dir/common/glad.c.i
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/FirstPersonCamera.dir/build.make CMakeFiles/FirstPersonCamera.dir/common/glad.c.i
 .PHONY : common/glad.c.i
 
 common/glad.s: common/glad.c.s
@@ -228,6 +243,7 @@ common/glad.c.s:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/TriangleTex.dir/build.make CMakeFiles/TriangleTex.dir/common/glad.c.s
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/SpherePhong.dir/build.make CMakeFiles/SpherePhong.dir/common/glad.c.s
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/CarScene.dir/build.make CMakeFiles/CarScene.dir/common/glad.c.s
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/FirstPersonCamera.dir/build.make CMakeFiles/FirstPersonCamera.dir/common/glad.c.s
 .PHONY : common/glad.c.s
 
 src/CarScene.o: src/CarScene.cpp.o
@@ -277,6 +293,30 @@ src/CubeScene.s: src/CubeScene.cpp.s
 src/CubeScene.cpp.s:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/CubeScene.dir/build.make CMakeFiles/CubeScene.dir/src/CubeScene.cpp.s
 .PHONY : src/CubeScene.cpp.s
+
+src/FirstPersonCamera.o: src/FirstPersonCamera.cpp.o
+.PHONY : src/FirstPersonCamera.o
+
+# target to build an object file
+src/FirstPersonCamera.cpp.o:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/FirstPersonCamera.dir/build.make CMakeFiles/FirstPersonCamera.dir/src/FirstPersonCamera.cpp.o
+.PHONY : src/FirstPersonCamera.cpp.o
+
+src/FirstPersonCamera.i: src/FirstPersonCamera.cpp.i
+.PHONY : src/FirstPersonCamera.i
+
+# target to preprocess a source file
+src/FirstPersonCamera.cpp.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/FirstPersonCamera.dir/build.make CMakeFiles/FirstPersonCamera.dir/src/FirstPersonCamera.cpp.i
+.PHONY : src/FirstPersonCamera.cpp.i
+
+src/FirstPersonCamera.s: src/FirstPersonCamera.cpp.s
+.PHONY : src/FirstPersonCamera.s
+
+# target to generate assembly for a file
+src/FirstPersonCamera.cpp.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/FirstPersonCamera.dir/build.make CMakeFiles/FirstPersonCamera.dir/src/FirstPersonCamera.cpp.s
+.PHONY : src/FirstPersonCamera.cpp.s
 
 src/Hello3D.o: src/Hello3D.cpp.o
 .PHONY : src/Hello3D.o
@@ -360,6 +400,7 @@ help:
 	@echo "... rebuild_cache"
 	@echo "... CarScene"
 	@echo "... CubeScene"
+	@echo "... FirstPersonCamera"
 	@echo "... Hello3D"
 	@echo "... SpherePhong"
 	@echo "... TriangleTex"
@@ -373,6 +414,9 @@ help:
 	@echo "... src/CubeScene.o"
 	@echo "... src/CubeScene.i"
 	@echo "... src/CubeScene.s"
+	@echo "... src/FirstPersonCamera.o"
+	@echo "... src/FirstPersonCamera.i"
+	@echo "... src/FirstPersonCamera.s"
 	@echo "... src/Hello3D.o"
 	@echo "... src/Hello3D.i"
 	@echo "... src/Hello3D.s"
