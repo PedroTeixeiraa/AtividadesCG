@@ -1,0 +1,43 @@
+# ============================================================
+#  Cena Jeep Renegade
+#  Lida por loadSceneConfig() em grauB/src/JeepRenegade.cpp
+#  Caminhos relativos a grauB/build/
+#
+#  camera x y z
+#  light  px py pz   r g b   intensidade   ligado
+#  mesh   <nome> <caminho_do_obj>
+#  object <nome> <mesh> x y z rotX rotY rotZ escala [bezier pontos...]
+#
+#  Observacao:
+#  Os pontos da trajetoria ficam na mesma linha do object, depois de "bezier".
+#  Cada trio x y z representa um ponto de controle.
+# ============================================================
+
+# ----- Camera inicial -----
+camera 0.0 2.4 8.5
+
+# ----- Iluminacao de 3 pontos (Phong) -----
+# key: luz principal quente
+light  3.8  4.8  3.2    1.00 0.88 0.70    1.35    1
+
+# fill: luz lateral fria mais fraca
+light -3.4  2.8  2.4    0.45 0.65 1.00    0.55    1
+
+# back: luz de recorte ao fundo
+light  0.0  3.8 -4.0    1.00 1.00 1.00    0.32    1
+
+# ----- Malhas carregadas (.obj) -----
+mesh jeep            ../../assets/Modelos3D/Jeep_Renegade_2016.obj
+mesh suzanne         ../../assets/Modelos3D/Suzanne.obj
+mesh suzanne_subdiv  ../../assets/Modelos3D/SuzanneSubdiv1.obj
+
+# ----- Objetos da cena -----
+
+# [0] Jeep principal com material .mtl, textura e trajetoria de Bezier fechada
+object jeep_animado jeep  0.0 -0.25  0.0   0.0  18.0 0.0   0.72  bezier   0.0 -0.25  0.0   -0.55 -0.25 -0.55    0.55 -0.25 -0.75    0.95 -0.25  0.0    0.55 -0.25  0.75   -0.55 -0.25  0.55
+
+# [1] Suzanne auxiliar para demonstrar mais de um OBJ na cena
+object suzanne suzanne  1.55 -0.18 -0.75   0.0 -38.0 0.0   0.36
+
+# [2] Suzanne subdividida como segundo objeto auxiliar
+object suzanne_subdiv suzanne_subdiv  -1.55 -0.18 -0.75   0.0 38.0 0.0   0.34
